@@ -1,16 +1,15 @@
-import pathlib
 import setuptools
 
-HERE = pathlib.Path(__file__).parent
-VERSION = '0.0.10'
+with open("README.md", "r", encoding="utf-8") as fh:
+    LONG_DESCRIPTION = fh.read()
+
+VERSION = '0.0.13'
 PACKAGE_NAME = 'djangoloadbalancer'
 AUTHOR = 'Daniel Klarenbach'
 URL = 'https://github.com/DanielKlarenbach/DjangoLoadBalancer'
-
 LICENSE = 'Apache License 2.0'
 DESCRIPTION = 'Package enabling to load balance requests to databases in django projects'
-LONG_DESCRIPTION = (HERE / "README.md").read_text()
-LONG_DESC_TYPE = "text/markdown"
+LONG_DESC_TYPE = 'text/markdown'
 INSTALL_REQUIRES = [
 
 ]
