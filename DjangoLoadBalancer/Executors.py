@@ -13,6 +13,7 @@ class NoQuerySetExecutor(Executor):
     def run_query(self,query,database):
         new_result = query.method().using(database.name) if query.method.__name__=='get_queryset' else query.method(using=database.name)
         self.result.put({query.query_id : new_result})
+        print(str(query.method)+database.name)
 
 class QuerySetExecutor(Executor):
     def run_query(self,query,database):

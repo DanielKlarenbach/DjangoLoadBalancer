@@ -23,6 +23,7 @@ class Interval(RAlgorithm):
 
     def update_info(self,interval,query_type):
         while True:
+            print(self._info_per_database)
             for i, db in enumerate(self._databases):
                 if not db.info.empty():
                     self._info_per_database[i] = db.info.get()

@@ -25,6 +25,6 @@ class DatabaseStatus(enum.Enum):
     DOWN="DOWN"
 
 class DatabaseEngine(enum.Enum):
-    POSTGRESQL="postgresql"
-    MYSQL="mysql"
-    SQLITE="sqlite3"
+    POSTGRESQL="django.db.backends.postgresql"
+    MYSQL="django.db.backends.mysql"
+    SQLITE="django.db.backends.sqlite3"

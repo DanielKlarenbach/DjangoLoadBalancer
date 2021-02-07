@@ -71,7 +71,7 @@ class LoadBalancerFactory:
     class OperationalErrorGenerator:
         @staticmethod
         def generate_operational_error(engine):
-            if engine==DatabaseEngine.POSTGRESQL:
+            if engine==DatabaseEngine.POSTGRESQL.value:
                 return psycopg2.OperationalError
-            elif engine==DatabaseEngine.SQLITE:
+            elif engine==DatabaseEngine.SQLITE.value:
                 return sqlite3.OperationalError

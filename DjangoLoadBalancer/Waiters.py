@@ -31,7 +31,7 @@ class WaitWaiter(Waiter):
             time.sleep(self._wait_time)
             try:
                 connections[database.name].connect()
-            except database.operatinal_error:
+            except database.operational_error:
                 pass
             else:
                 self._executor.run_query(query,database)
