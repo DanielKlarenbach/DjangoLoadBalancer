@@ -16,7 +16,7 @@ class LoadBalancer():
     def run_query(self, query):
         self.generate_query_id()
         query.query_id = self.current_query_id
-        if query.wait == Wait.DONT_WAIT.value:
+        if query.wait == Wait.DONT_WAIT:
             self.execute_r(query)
         else:
             self.execute_cud(query)

@@ -24,7 +24,7 @@ class WaitWaiter(Waiter):
         try:
             self._executor.run_query(query, database)
         except django.db.utils.OperationalError:
-            database.status = DatabaseStatus.DOWN.value
+            database.status = DatabaseStatus.DOWN
             self.wait_for_connection(query, database)
 
     def wait_for_connection(self, query, database):
@@ -36,7 +36,7 @@ class WaitWaiter(Waiter):
                 pass
             else:
                 self._executor.run_query(query, database)
-                database.status = DatabaseStatus.RUNNING.value
+                database.status = DatabaseStatus.RUNNING
                 break
 
 
@@ -45,5 +45,5 @@ class DontWaitWaiter(Waiter):
         try:
             self._executor.run_query(query, database)
         except django.db.utils.OperationalError:
-            database.status = DatabaseStatus.DOWN.value
+            database.status = DatabaseStatus.DOWN
             raise django.db.utils.OperationalError

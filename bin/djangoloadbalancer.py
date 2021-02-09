@@ -1,8 +1,8 @@
 import pickle
 from multiprocessing.connection import Listener
 
-from DjangoLoadBalancer.DjangoLoadBalancer.local_settings import LOAD_BALANCER
-from .DjangoLoadBalancer.LoadBalancerFactory import LoadBalancerFactory
+from DjangoLoadBalancer.LoadBalancerFactory import LoadBalancerFactory
+from DjangoLoadBalancer.local_settings import LOAD_BALANCER
 
 if __name__ == "__main__":
     load_balancer = LoadBalancerFactory.create_load_balancer()

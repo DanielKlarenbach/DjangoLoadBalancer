@@ -32,11 +32,10 @@ class LoadBalancerFactory:
             threads = []
             databases = []
             for i, name in enumerate(LOAD_BALANCER['DATABASES']):
-                database = Database(name, {Wait.WAIT.value: WaitWaiter(LOAD_BALANCER['WAIT_TIME']),
-                                           Wait.DONT_WAIT.value: DontWaitWaiter()},
-                                    {QueryType.QUERYSET.value: QuerySetExecutor(result),
-                                     QueryType.NO_QUERYSET.value: NoQuerySetExecutor(result)},
-                                    DATABASES[name]['ENGINE'],
+                database = Database(name, {Wait.WAIT: WaitWaiter(LOAD_BALANCER['WAIT_TIME']),
+                                           Wait.DONT_WAIT: DontWaitWaiter()},
+                                    {QueryType.QUERYSET: QuerySetExecutor(result),
+                                     QueryType.NO_QUERYSET: NoQuerySetExecutor(result)}, DATABASES[name]['ENGINE'],
                                     cls.OperationalErrorGenerator.generate_operational_error(DATABASES[name]['ENGINE']))
                 databases.append(database)
                 threads.append(threading.Thread(target=database.run_queries, args=(), daemon=True))
@@ -57,7 +56,7 @@ class LoadBalancerFactory:
             for database in databases:
                 database.executors[QueryType.INFO_RESPONSE_TIME] = ResponseTimeExecutor()
             threading.Thread(target=algorithm.update_info,
-                             args=(LOAD_BALANCER['R_ALGORITHM']['INTERVAL'], QueryType.INFO_RESPONSE_TIME.value),
+                             args=(LOAD_BALANCER['R_ALGORITHM']['INTERVAL'], QueryType.INFO_RESPONSE_TIME),
                              daemon=True).start()
             return algorithm
         elif LOAD_BALANCER['R_ALGORITHM']['NAME'] == "INTERVAL_NUMBER_OF_CONNECTIONS":
@@ -65,7 +64,7 @@ class LoadBalancerFactory:
             for database in databases:
                 database.executors[QueryType.INFO_NUMBER_OF_CONNECTIONS] = NumberOfConnectionsExecutor()
             threading.Thread(target=algorithm.update_info,
-                             args=(LOAD_BALANCER['R_ALGORITHM']['INTERVAL'], QueryType.INFO_NUMBER_OF_CONNECTIONS.value),
+                             args=(LOAD_BALANCER['R_ALGORITHM']['INTERVAL'], QueryType.INFO_NUMBER_OF_CONNECTIONS),
                              daemon=True).start()
             return algorithm
 

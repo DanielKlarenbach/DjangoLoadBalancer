@@ -6,7 +6,7 @@ from queue import Queue
 class Database():
     def __init__(self, name, waiters, executors, engine=None, operational_error=None):
         self.name = name
-        self.status = DatabaseStatus.RUNNING.value
+        self.status = DatabaseStatus.RUNNING
         self.queries = Queue()
         self.has_queries = threading.Semaphore(value=0)
         self.waiters = waiters

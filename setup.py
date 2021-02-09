@@ -3,7 +3,7 @@ import setuptools
 with open("README.md", "r", encoding="utf-8") as fh:
     LONG_DESCRIPTION = fh.read()
 
-VERSION = '0.0.13'
+VERSION = '0.0.23'
 PACKAGE_NAME = 'djangoloadbalancer'
 AUTHOR = 'Daniel Klarenbach'
 URL = 'https://github.com/DanielKlarenbach/DjangoLoadBalancer'
@@ -25,4 +25,5 @@ setuptools.setup(
     long_description_content_type=LONG_DESC_TYPE,
     install_requires=INSTALL_REQUIRES,
     packages=setuptools.find_packages(),
+    scripts=['bin/djangoloadbalancer.py'],
 )

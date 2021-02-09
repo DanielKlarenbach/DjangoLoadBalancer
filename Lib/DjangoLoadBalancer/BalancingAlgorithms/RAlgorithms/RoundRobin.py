@@ -8,7 +8,7 @@ class RoundRobin(RAlgorithm):
         self._next_db = 0
 
     def execute_r(self, query):
-        while self._databases[self._next_db].status == DatabaseStatus.DOWN.value or not self._databases[self._next_db].queries.empty:
+        while self._databases[self._next_db].status == DatabaseStatus.DOWN or not self._databases[self._next_db].queries.empty:
             self._next_db += 1
             if self._next_db == len(self._databases): self._next_db = 0
         db_for_read = self._databases[self._next_db]
