@@ -26,5 +26,3 @@ setuptools.setup(
     install_requires=INSTALL_REQUIRES,
     packages=setuptools.find_packages(),
 )
-
-

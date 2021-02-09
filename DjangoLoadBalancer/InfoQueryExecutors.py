@@ -12,6 +12,7 @@ class ResponseTimeExecutor(InfoQueryExecutor):
         end = time.perf_counter()
         return end - start
 
+
 class NumberOfConnectionsExecutor(InfoQueryExecutor):
     def get_statistic(self, query, cursor, database):
         cursor.execute(self.Generator.generate(database))

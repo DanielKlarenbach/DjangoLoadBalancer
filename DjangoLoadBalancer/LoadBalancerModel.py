@@ -1,21 +1,37 @@
 import inspect
+import pickle
+from multiprocessing.connection import Client
 
 from django.db import models
 
-from .LoadBalancerFactory import LoadBalancerFactory
 from .Query import Query, Wait, QueryType
 
-load_balancer=LoadBalancerFactory.create_load_balancer()
 
-def make_f(method,name):
-    def new_function(self, *args, **kwargs):
-        return load_balancer.run_query(Query(Wait.WAIT, QueryType.QUERYSET, method=name, args=args, kwargs=kwargs, model=self.model))
-    return new_function
+def send_query_to_listener(query):
+    from DjangoLoadBalancer.DjangoLoadBalancer.local_settings import LOAD_BALANCER
+    address = (LOAD_BALANCER['ADDRESS']['HOST'], LOAD_BALANCER['ADDRESS']['PORT'])
+    connection = Client(address, authkey=bytes(LOAD_BALANCER['ADDRESS']['AUTHKEY'], 'utf-8'))
+    payload = pickle.dumps(query)
+    connection.send(payload)
+    result = pickle.loads(connection.recv())
+    connection.send('close')
+    connection.close()
+    return result
+
+
+def loadbalance_function(name):
+    def loadbalanced_function(self, *args, **kwargs):
+        query = Query(Wait.WAIT, QueryType.QUERYSET, method=name, args=args, kwargs=kwargs, model=self.model)
+        result = send_query_to_listener(query)
+        return result
+
+    return loadbalanced_function
+
 
 def load_balance(cls):
     for name, method in inspect.getmembers(cls, predicate=inspect.isfunction):
         if not name.startswith('_') and 'alters_data' in dir(method):
-            setattr(cls, name, make_f(method,name))
+            setattr(cls, name, loadbalance_function(name))
     return cls
 
 
@@ -23,28 +39,36 @@ def load_balance(cls):
 class LoadBalancerQuerySet(models.QuerySet):
     pass
 
+
 class BaseLoadBalancerManager(models.Manager):
     def get_queryset(self):
         return LoadBalancerQuerySet(self.model)
 
+
 class LoadBalancerManager(BaseLoadBalancerManager):
-    def __init__(self, load_balancer):
+    def __init__(self):
         super(LoadBalancerManager, self).__init__()
-        self.load_balancer = load_balancer
 
     def get_queryset(self):
-        return self.load_balancer.run_query(Query(Wait.DONT_WAIT, QueryType.NO_QUERYSET, super().get_queryset))
+        query = Query(Wait.DONT_WAIT, QueryType.NO_QUERYSET, method='get_queryset', model=self.model)
+        result = send_query_to_listener(query)
+        return result
+
 
 class LoadBalancerModel(models.Model):
-    helper = models.Manager()
-    load_balancer = load_balancer
-    objects = LoadBalancerManager(load_balancer)
+    models_manager = models.Manager()
+    loadbalancer_base_manager = BaseLoadBalancerManager()
+    objects = LoadBalancerManager()
 
     def save(self, *args, **kwargs):
-        self.load_balancer.run_query(Query(Wait.WAIT, QueryType.NO_QUERYSET, super().save, args, kwargs))
+        query = Query(wait=Wait.WAIT, type=QueryType.NO_QUERYSET, method='save', model=self, args=args, kwargs=kwargs)
+        result = send_query_to_listener(query)
+        return result
 
     def delete(self, *args, **kwargs):
-        self.load_balancer.run_query(Query(Wait.WAIT, QueryType.NO_QUERYSET, super().delete, args, kwargs))
+        query = Query(wait=Wait.WAIT, type=QueryType.NO_QUERYSET, method='delete', model=self, args=args, kwargs=kwargs)
+        result = send_query_to_listener(query)
+        return result
 
     class Meta:
         abstract = True
