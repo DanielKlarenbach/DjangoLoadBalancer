@@ -66,7 +66,7 @@ class LoadBalancerModel(models.Model):
         return result
 
     def delete(self, *args, **kwargs):
-        query = Query(wait=Wait.WAIT.vale, type=QueryType.NO_QUERYSET.value, method='delete', model=self, args=args, kwargs=kwargs)
+        query = Query(wait=Wait.WAIT.value, type=QueryType.NO_QUERYSET.value, method='delete', model=self, args=args, kwargs=kwargs)
         result = send_query_to_listener(query)
         return result
 
