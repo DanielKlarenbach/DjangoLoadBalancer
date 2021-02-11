@@ -6,12 +6,13 @@ from .Query import Wait
 
 
 class LoadBalancer():
-    def __init__(self, result, databases, cud_algorithm, r_algorithm):
+    def __init__(self, result, databases, cud_algorithm, r_algorithm,watch_dog):
         self.current_query_id = 0
         self.result = result
         self.databases = databases
         self.cud_algorithm = cud_algorithm
         self.r_algorithm = r_algorithm
+        self.watch_dog=watch_dog
 
     def run_query(self, query):
         self.generate_query_id()

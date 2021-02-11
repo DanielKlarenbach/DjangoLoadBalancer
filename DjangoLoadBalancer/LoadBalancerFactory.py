@@ -8,12 +8,13 @@ from .BalancingAlgorithms.CUDAlgorithms.MultithreadingAlgorithm import \
     MultithreadingAlgorithm
 from .BalancingAlgorithms.RAlgorithms.Interval import Interval
 from .BalancingAlgorithms.RAlgorithms.RoundRobin import RoundRobin
-from .Database import Database, DatabaseEngine
+from .Database import Database, DatabaseEngine, DatabaseStatus
 from .Executors import QuerySetExecutor, NoQuerySetExecutor
 from .InfoQueryExecutors import ResponseTimeExecutor, NumberOfConnectionsExecutor
 from .LoadBalancer import LoadBalancer
 from .Query import QueryType, Wait
 from .Waiters import WaitWaiter, DontWaitWaiter
+from .WatchDog import WatchDog
 from .local_settings import LOAD_BALANCER,DATABASES
 
 
@@ -22,9 +23,12 @@ class LoadBalancerFactory:
     def create_load_balancer(cls):
         result = Queue()
         threads, databases = cls._create_databases(result)
+        watch_dog=WatchDog(databases,LOAD_BALANCER['WAIT_TIME'])
+        watch_dog_thread=threading.Thread(target=watch_dog.check_databases_statuses, args=(), daemon=True)
+        watch_dog_thread.start()
         cud_algorithm = cls._create_cud_algorithm(databases, threads)
         r_algorithm = cls._create_r_algorithm(databases)
-        return LoadBalancer(result, databases, cud_algorithm, r_algorithm)
+        return LoadBalancer(result, databases, cud_algorithm, r_algorithm,watch_dog)
 
     @classmethod
     def _create_databases(cls, result):
@@ -32,7 +36,7 @@ class LoadBalancerFactory:
             threads = []
             databases = []
             for i, name in enumerate(LOAD_BALANCER['DATABASES']):
-                database = Database(name, {Wait.WAIT.value: WaitWaiter(LOAD_BALANCER['WAIT_TIME']),
+                database = Database(name, {Wait.WAIT.value: WaitWaiter(),
                                            Wait.DONT_WAIT.value: DontWaitWaiter()},
                                     {QueryType.QUERYSET.value: QuerySetExecutor(result),
                                      QueryType.NO_QUERYSET.value: NoQuerySetExecutor(result)},

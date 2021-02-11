@@ -13,7 +13,7 @@ class Interval(RAlgorithm):
 
     def execute_r(self, query):
         info_per_database = sorted(self._info_per_database, key=self._info_per_database.get)
-        while self._databases[info_per_database[self._next_db]].status == DatabaseStatus.DOWN.value or not self._databases[info_per_database[self._next_db]].queries.empty:
+        while self._databases[info_per_database[self._next_db]].check_status() == DatabaseStatus.DOWN.value or not self._databases[info_per_database[self._next_db]].queries.empty:
             self._next_db += 1
             if self._next_db == len(self._databases): self._next_db = 0
         db_for_read = self._databases[info_per_database[self._next_db]]
