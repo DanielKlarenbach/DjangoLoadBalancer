@@ -4,7 +4,7 @@ from multiprocessing.connection import Client
 
 from django.db import models
 
-from .Query import Query, Wait, QueryType
+from .query import Query, Wait, QueryType
 
 
 def send_query_to_listener(query):

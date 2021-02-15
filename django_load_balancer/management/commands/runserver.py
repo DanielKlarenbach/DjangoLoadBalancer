@@ -120,8 +120,8 @@ class Command(BaseCommand):
         # requires_migrations_check attribute.
         try:
             self.check_migrations()
-        except django.db.utils.OperationalError:
-            print("SZACH MAT")
+        except django.db.utils.OperationalError as e:
+            print(f"LOAD BALANCER: {e}")
         now = datetime.now().strftime('%B %d, %Y - %X')
         self.stdout.write(now)
         self.stdout.write((

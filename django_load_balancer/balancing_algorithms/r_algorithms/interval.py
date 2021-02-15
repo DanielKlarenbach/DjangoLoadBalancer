@@ -1,13 +1,13 @@
 from time import sleep
 
-from ..RAlgorithm import RAlgorithm
-from ...Database import DatabaseStatus
-from ...Query import Query, Wait
+from ..r_algorithm import RAlgorithm
+from ...database import DatabaseStatus
+from ...query import Query, Wait
 
 
 class Interval(RAlgorithm):
     def __init__(self, databases):
-        self._databases = databases
+        super(Interval, self).__init__(databases)
         self._next_db = 0
         self._info_per_database = {x: 0 for x in range(len(databases))}
 

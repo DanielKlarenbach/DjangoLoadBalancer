@@ -8,9 +8,9 @@ Package enabling to load balance requests to databases in django projects.
 1. Rather than extending models.Model, your models must extend LoadBalancerModel, example:
 ```python
 from django.db import models
-from DjangoLoadBalancer.DjangoLoadBalancer import LoadBalancerModel
+from DjangoLoadBalancer.django_load_balancer import load_balancer_model
 
-class Destination(LoadBalancerModel):
+class Destination(load_balancer_model):
     name = models.CharField(max_length=100)
     desc = models.CharField(max_length=100)
 ```

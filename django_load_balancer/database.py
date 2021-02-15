@@ -1,27 +1,30 @@
 import enum
+import queue
 import threading
-from queue import Queue
 
 
 class Database():
-    def __init__(self, name, waiters, executors, engine=None, operational_error=None):
+    def __init__(self, name, waiters=None, engine=None, operational_error=None, load_balancer=None):
         self.name = name
         self.status = DatabaseStatus.RUNNING.value
-        self.queries = Queue()
-        self.has_queries = threading.Semaphore(value=0)
         self.status_lock = threading.Lock()
-        self.is_up=threading.Event()
+        self.queries = queue.Queue()
+        self.has_queries = threading.Semaphore(value=0)
+        self.query_ended = threading.Event()
+        self.is_up = threading.Event()
         self.waiters = waiters
-        self.executors = executors
         self.engine = engine
         self.operational_error = operational_error
-        self.info = Queue(1)
+        self.info = queue.Queue(1)
+        self.load_balancer = load_balancer
+        self.r_query_succeeded = False
+        self.r_query_ended = threading.Event()
 
     def run_queries(self):
         while self.has_queries.acquire():
+            self.query_ended.clear()
             query = self.queries.get()
-            self.waiters[query.wait]._executor = self.executors[query.type]
-            self.waiters[query.wait].run_query(query, self)
+            self.waiters[query.wait].run_query(query)
 
     def change_status(self, new_status):
         with self.status_lock:
