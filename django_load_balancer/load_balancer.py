@@ -6,7 +6,7 @@ import threading
 from .query import Wait
 
 
-class LoadBalancer():
+class LoadBalancer:
     def __init__(self, databases, cud_algorithm, r_algorithm):
         self._current_query_id = 0
         self._result = queue.Queue(1)
