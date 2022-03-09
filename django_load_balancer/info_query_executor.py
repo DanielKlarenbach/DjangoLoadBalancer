@@ -1,7 +1,7 @@
 import time
 
-from .Database import DatabaseEngine
-from .Executors import InfoQueryExecutor
+from .database import DatabaseEngine
+from .executor import InfoQueryExecutor
 
 
 class ResponseTimeExecutor(InfoQueryExecutor):
@@ -15,7 +15,7 @@ class ResponseTimeExecutor(InfoQueryExecutor):
 
 class NumberOfConnectionsExecutor(InfoQueryExecutor):
     def get_statistic(self, query, cursor, database):
-        cursor.execute(self.Generator.generate(database))
+        cursor.execute(Generator.generate(database))
         return self.Parser.parse(cursor.fetchall(), database)
 
     class Parser:
@@ -24,8 +24,10 @@ class NumberOfConnectionsExecutor(InfoQueryExecutor):
             if database.engine == DatabaseEngine.POSTGRESQL.value:
                 return result[0][0]
 
-    class Generator:
-        @staticmethod
-        def generate(database):
-            if database.engine == DatabaseEngine.POSTGRESQL.value:
-                return "select count(*) from pg_stat_activity where pid <> pg_backend_pid() and usename = current_user;"
+class Generator:
+    @staticmethod
+    def generate(database):
+        if database.engine == DatabaseEngine.POSTGRESQL.value:
+            return "select count(*) from pg_stat_activity where pid <> pg_backend_pid() and usename = current_user;"
+        elif database.engine == DatabaseEngine.MYSQL.value:
+            return "select count(*) from information_schema.processlist;"

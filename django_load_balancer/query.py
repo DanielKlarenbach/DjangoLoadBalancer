@@ -2,14 +2,14 @@ import enum
 
 
 class Query:
-    def __init__(self, wait, type, method=None, args=[], kwargs={}, model=None, query_id=None):
+    def __init__(self, wait, type, method=None, args=[], kwargs={}, model=None, id=None):
         self.method = method
         self.args = args
         self.kwargs = kwargs
         self.type = type
         self.wait = wait
         self.model = model
-        self.query_id = query_id
+        self.id = id
 
 
 class QueryType(enum.Enum):
